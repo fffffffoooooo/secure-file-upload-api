@@ -17,9 +17,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
+
 def hash_password(password: str) -> str:
-    # bcrypt limite à 72 bytes
-    return pwd_context.hash(password.encode("utf-8")[:72])
+    if len(password) > 72:
+        password = password[:72]
+    return pwd_context.hash(password)
 
 
 
