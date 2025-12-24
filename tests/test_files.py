@@ -6,25 +6,30 @@ from app.main import app
 client = TestClient(app)
 
 
-def register_and_login():
-    """Helper: crée un utilisateur et retourne un token JWT"""
-    email = "filetest@example.com"
-    password = "TestPassword123!"
 
-    # Register
+def register_and_login():
+    email = "testuser@example.com"
+    password = "Password123!"  # ⚠️ <= 72 chars
+
     client.post(
         "/auth/register",
-        json={"email": email, "password": password},
+        json={
+            "email": email,
+            "password": password,
+        },
     )
 
-    # Login
     response = client.post(
         "/auth/login",
-        data={"username": email, "password": password},
+        data={
+            "username": email,
+            "password": password,
+        },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
 
     return response.json()["access_token"]
+
 
 
 def test_upload_without_token():
