@@ -4,12 +4,11 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
-
-
+import uuid
 
 def register_and_login():
-    email = "testuser@example.com"
-    password = "Password123!"  # ⚠️ <= 72 chars
+    email = f"testuser_{uuid.uuid4()}@example.com"
+    password = "Password123!"
 
     client.post(
         "/auth/register",
@@ -29,6 +28,7 @@ def register_and_login():
     )
 
     return response.json()["access_token"]
+
 
 
 
