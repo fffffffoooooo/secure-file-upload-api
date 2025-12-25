@@ -7,8 +7,42 @@ on:
     branches: [ "master" ]
 
 jobs:
-  test:
+
+  # =========================
+  # 🔐 SECURITY
+  # =========================
+  security:
+    name: Security checks
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety
+          pip install -r requirements.txt
+
+      - name: Run Bandit
+        run: bandit -r app -ll
+
+      - name: Dependency vulnerability scan
+        run: safety check || true
+
+  # =========================
+  # 🧪 TESTS
+  # =========================
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: security
 
     steps:
       - name: Checkout code
@@ -25,6 +59,31 @@ jobs:
           pip install -r requirements.txt
           pip install pytest httpx
 
-      - name: Run tests
+      - name: Run pytest
+        run: pytest -v
+
+  # =========================
+  # 🏗️ BUILD
+  # =========================
+  build:
+    name: Build check
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
         run: |
-          pytest
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate FastAPI app
+        run: |
+          python -c "from app.main import app; print('FastAPI app loaded')"
