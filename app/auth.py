@@ -12,6 +12,7 @@ from app.models import User
 from app.schemas import Token, UserCreate, UserResponse
 from sqlalchemy.exc import IntegrityError
 
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -19,10 +20,7 @@ ALGORITHM = "HS256"
 
 
 def hash_password(password: str) -> str:
-    if len(password) > 72:
-        password = password[:72]
     return pwd_context.hash(password)
-
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -72,3 +70,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token = create_access_token(subject=user.email)
     return {"access_token": access_token, "token_type": "bearer"}
+
+
